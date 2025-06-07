@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Math Equation Grapher</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+  <style>
+    body { font-family: Arial; text-align: center; margin: 20px; }
+    input { width: 300px; padding: 8px; font-size: 16px; }
+    #graph { width: 90%; max-width: 800px; height: 500px; margin: auto; }
+  </style>
+</head>
+<body>
+
+  <h2>Graph Your Equation</h2>
+  <input type="text" id="equation" placeholder="Type e.g. sin(x), x^2 - 3*x + 2">
+  <button onclick="plotGraph()">Plot</button>
+
+  <div id="graph"></div>
+
+  <script>
+    function plotGraph() {
+      const expr = document.getElementById("equation").value;
+      let xData = [], yData = [];
+
+      // Try to compile and evaluate the expression
+      try {
+        const parsed = math.compile(expr);
+
+        for (let x = -10; x <= 10; x += 0.1) {
+          const scope = { x: x };
+          let y = parsed.evaluate(scope);
+          if (typeof y === "number" && isFinite(y)) {
+            xData.push(x);
+            yData.push(y);
+          } else {
+            xData.push(x);
+            yData.push(null);
+          }
+        }
+
+        const trace = {
+          x: xData,
+          y: yData,
+          mode: 'lines',
+          type: 'scatter',
+          line: { color: 'blue' }
+        };
+
+        const layout = {
+          title: `Graph of: y = ${expr}`,
+          xaxis: { title: 'x' },
+          yaxis: { title: 'y' }
+        };
+
+        Plotly.newPlot('graph', [trace], layout);
+
+      } catch (error) {
+        alert("Invalid equation: " + error.message);
+      }
+    }
+  </script>
+
+</body>
+</html>
